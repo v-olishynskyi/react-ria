@@ -1,0 +1,15 @@
+.sticky-wrapper {
+  position: relative;
+  height: 56px; /* We need to change this value */
+  margin-bottom: 2rem;
+  transition: all 0.2s ease-in;
+}
+
+.sticky .sticky-inner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  transition: all 0.2s ease-in;
+}

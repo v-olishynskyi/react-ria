@@ -1,0 +1,9 @@
+ul.characteristics_list {
+  list-style-type: none;
+  li:before {
+    content: "✓";
+    color: blue;
+    font-size: 18px;
+    margin-right: 2px;
+  }
+}
