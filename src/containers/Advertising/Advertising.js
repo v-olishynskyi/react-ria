@@ -4,6 +4,7 @@ import useFetch from "../../hooks/useFetch";
 import Loader from "../../components/Loader/Loader";
 import Axios from "axios";
 import CarouselComponent from "./CarouselComponent/CarouselComponent";
+import AddToWishlist from "../../components/AddToWishlist/AddToWishlist";
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -220,12 +221,10 @@ const obj = {
   isBinotel: 1,
 };
 
-const Advertising = ({ match }) => {
+const Advertising = ({ match, location }) => {
   const slugId = match.params.slug;
   // eslint-disable-next-line no-unused-vars
-  const [{ response, isLoading, error }, doFetch] = useFetch(
-    `/info/${slugId}?api_key=${API_KEY}`
-  );
+  const [{ response, isLoading, error }, doFetch] = useFetch(`/info/${slugId}?api_key=${API_KEY}`);
   const [rate, setRate] = useState(null);
 
   useEffect(() => {
@@ -248,21 +247,21 @@ const Advertising = ({ match }) => {
   }, []);
 
   let rateUSD = null;
-  rate &&
-    rate.map((item) =>
-      item.ccy.toLowerCase() === "usd" ? (rateUSD = item.buy) : ""
-    );
+  rate && rate.map((item) => (item.ccy.toLowerCase() === "usd" ? (rateUSD = item.buy) : ""));
 
   // if (!isLoading && response) console.log(response);
 
   return (
     <>
-      <h1>МОК</h1>
+      <AddToWishlist location={location} id={slugId} />
+      {!isLoading && response && (
+        <h1>
+          Продам {response.rooms_count}-x кімнатну квартиру в м. {response.city_name}{" "}
+        </h1>
+      )}
       {!isLoading && response && (
         <CarouselComponent
-          photos={Object.values(response.photos).sort(
-            (a, b) => a.ordering - b.ordering
-          )}
+          photos={Object.values(response.photos).sort((a, b) => a.ordering - b.ordering)}
         />
       )}
       {isLoading && <Loader />}

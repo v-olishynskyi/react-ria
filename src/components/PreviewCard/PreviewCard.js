@@ -3,12 +3,12 @@ import { Row, Col, NavLink, CardImg, CardTitle, CardSubtitle, CardText } from "r
 import { Link } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 import AddToWishlist from "../AddToWishlist/AddToWishlist";
-import Axios from "axios";
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
-const PreviewCard = ({ id, location, onChangeSaved }) => {
+const PreviewCard = ({ id, location, onChangeSaved, rateUSD }) => {
   const [{ response, isLoading }, doFetch] = useFetch(`info/${id}?api_key=${API_KEY}`);
+
   const [saved, setSaved] = useState(JSON.parse(localStorage.getItem("savedItem")));
 
   const addToWishlist = React.useCallback(() => {
@@ -37,29 +37,6 @@ const PreviewCard = ({ id, location, onChangeSaved }) => {
     onChangeSaved(saved);
   }, [saved, onChangeSaved]);
 
-  const [rate, setRate] = useState(null);
-
-  useEffect(() => {
-    doFetch();
-  }, [doFetch]);
-
-  useEffect(() => {
-    async function getRate() {
-      try {
-        const res = await Axios.get(
-          "https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5"
-        );
-        setRate(res.data);
-      } catch (error) {
-        console.warn(error);
-      }
-    }
-
-    getRate();
-  }, []);
-
-  let rateUSD = null;
-  rate && rate.map((item) => (item.ccy.toLowerCase() === "usd" ? (rateUSD = item.buy) : ""));
   // !isLoading &&
   //   response &&
   //   console.log(
@@ -82,17 +59,6 @@ const PreviewCard = ({ id, location, onChangeSaved }) => {
                       : "https://i.ibb.co/3S8dYVM/unnamed.jpg"
                   }
                 ></CardImg>
-                {/* <picture>
-                  <source
-                    srcSet={
-                      response.main_photo ? 
-                      "https://cdn.riastatic.com/photos/" +
-                      response.main_photo.replace(/\.jpg/gi, "b.webp") : ""
-                    }
-                    type="image/webp"
-                  />
-                  <img src={`https://cdn.riastatic.com/photos/${response.main_photo}`} alt={""} />
-                </picture> */}
               </NavLink>
             </Col>
             <Col md={{ size: "7" }}>
