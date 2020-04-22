@@ -5,6 +5,7 @@ import Loader from "../../components/Loader/Loader";
 import Axios from "axios";
 import CarouselComponent from "./CarouselComponent/CarouselComponent";
 import AddToWishlist from "../../components/AddToWishlist/AddToWishlist";
+import { Col } from "reactstrap";
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -226,6 +227,25 @@ const Advertising = ({ match, location }) => {
   // eslint-disable-next-line no-unused-vars
   const [{ response, isLoading, error }, doFetch] = useFetch(`/info/${slugId}?api_key=${API_KEY}`);
   const [rate, setRate] = useState(null);
+  const [saved, setSaved] = useState(JSON.parse(localStorage.getItem("savedItem")));
+
+  const addToWishlist = React.useCallback(() => {
+    const ls = localStorage.getItem("savedItem");
+    let arr = JSON.parse(ls);
+
+    if (arr) {
+      if (arr.includes(slugId)) {
+        arr.splice(arr.indexOf(slugId), 1);
+      } else {
+        arr.push(slugId);
+      }
+      localStorage.setItem("savedItem", JSON.stringify(arr));
+    } else {
+      localStorage.setItem("savedItem", JSON.stringify([slugId]));
+    }
+
+    setSaved(arr);
+  }, [slugId]);
 
   useEffect(() => {
     doFetch();
@@ -253,7 +273,10 @@ const Advertising = ({ match, location }) => {
 
   return (
     <>
-      <AddToWishlist location={location} id={slugId} />
+      <Col className="pl-0" xs="1" onClick={addToWishlist}>
+        <AddToWishlist location={location} id={slugId} />
+      </Col>
+
       {!isLoading && response && (
         <h1>
           Продам {response.rooms_count}-x кімнатну квартиру в м. {response.city_name}{" "}

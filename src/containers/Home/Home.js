@@ -19,9 +19,9 @@ const Home = ({ location }) => {
   const [cityID, setCityID] = useState(ls ? ls.cityID : 4);
 
   const apiURL = `search?api_key=${API_KEY}&city_id=${cityID}&stateID=4&category=1&realty_type=2&operation_type=1&page=0&characteristic[209][from]=${
-    cSelected.sort((a, b) => a - b)[0] ? cSelected.sort((a, b) => a - b)[0] : 1
+    cSelected && cSelected.sort((a, b) => a - b)[0] ? cSelected.sort((a, b) => a - b)[0] : 1
   }${
-    cSelected.sort((a, b) => a - b)[cSelected.length - 1] >= 4
+    cSelected && cSelected.sort((a, b) => a - b)[cSelected.length - 1] >= 4
       ? ""
       : "&characteristic[209][to]=" + cSelected.sort((a, b) => a - b)[cSelected.length - 1]
   }&characteristic[234][from]=${priceFrom}&characteristic[234][to]=${priceTo}&characteristic[242]=240&limit=5&page=0`;
