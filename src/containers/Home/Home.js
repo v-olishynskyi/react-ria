@@ -7,31 +7,33 @@ import NoSearchResult from "../../components/NoSearchResults/NoSearchResult";
 import PreviewCard from "../../components/PreviewCard/PreviewCard";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import Axios from "axios";
+import Pagination from "react-js-pagination";
+// import "bootstrap/less/bootstrap.less";
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const Home = ({ location }) => {
   const [ls, setLs] = useLocalStorage("userFilter");
-  // eslint-disable-next-line no-unused-vars
   const [cSelected, setCSelected] = useState(ls ? ls.cSelected : []);
   const [priceFrom, setPriceFrom] = useState(ls ? ls.priceFrom : "");
   const [priceTo, setPriceTo] = useState(ls ? ls.priceTo : "");
   const [cityID, setCityID] = useState(ls ? ls.cityID : 4);
+  const [rate, setRate] = useState(null);
+  const [currentPage, setCurrentPage] = useState(ls ? ls.currentPage : 1);
+  const [limit] = useState(10);
 
   const apiURL = `search?api_key=${API_KEY}&city_id=${cityID}&stateID=4&category=1&realty_type=2&operation_type=1&page=0&characteristic[209][from]=${
     cSelected && cSelected.sort((a, b) => a - b)[0] ? cSelected.sort((a, b) => a - b)[0] : 1
   }${
-    cSelected && cSelected.sort((a, b) => a - b)[cSelected.length - 1] >= 4
+    cSelected &&
+    cSelected.sort((a, b) => a - b).length > 0 &&
+    cSelected.sort((a, b) => a - b)[cSelected.length - 1] >= 4
       ? ""
       : "&characteristic[209][to]=" + cSelected.sort((a, b) => a - b)[cSelected.length - 1]
-  }&characteristic[234][from]=${priceFrom}&characteristic[234][to]=${priceTo}&characteristic[242]=240&limit=5&page=0`;
-
+  }&characteristic[234][from]=${priceFrom}&characteristic[234][to]=${priceTo}&characteristic[242]=240&limit=${limit}&page=${
+    currentPage - 1
+  }`;
   const [{ response, isLoading }, doFetch] = useFetch(apiURL);
-  const [rate, setRate] = useState(null);
-
-  useEffect(() => {
-    doFetch();
-  }, [doFetch]);
 
   useEffect(() => {
     async function getRate() {
@@ -52,11 +54,9 @@ const Home = ({ location }) => {
   rate && rate.map((item) => (item.ccy.toLowerCase() === "usd" ? (rateUSD = item.buy) : ""));
 
   useEffect(() => {
-    setLs({ priceFrom, priceTo, cityID, cSelected });
+    setLs({ priceFrom, priceTo, cityID, cSelected, currentPage });
     doFetch();
-  }, [doFetch, priceFrom, priceTo, cityID, setLs, cSelected]);
-
-  // if (!isLoading && response) console.log(response);
+  }, [doFetch, priceFrom, priceTo, cityID, setLs, cSelected, currentPage]);
 
   function handleChangePrice(element) {
     element.id === "priceFrom" ? setPriceFrom(element.value) : setPriceTo(element.value);
@@ -87,6 +87,13 @@ const Home = ({ location }) => {
     setCityID(data);
   }
 
+  function onChangePage(page) {
+    setCurrentPage(page);
+  }
+
+  const indexOfLastCard = currentPage * limit;
+  const indexOfFirstCard = indexOfLastCard - limit;
+
   return (
     <>
       <Row>
@@ -103,11 +110,23 @@ const Home = ({ location }) => {
           />
         </Col>
         <Col md="9">
+          {!isLoading && response && (
+            <Pagination
+              onChange={onChangePage}
+              totalItemsCount={100}
+              itemsCountPerPage={limit}
+              pageRangeDisplayed={10}
+              activePage={currentPage}
+              itemClass="page-item"
+              linkClass="page-link"
+            />
+          )}
+
           {isLoading ? (
             <Loader />
           ) : !isLoading && response && response.count > 0 ? (
             response.items
-              .slice(20, 40)
+              .slice(indexOfFirstCard, indexOfLastCard)
               .map((id, key) => (
                 <PreviewCard
                   key={key}
@@ -120,7 +139,6 @@ const Home = ({ location }) => {
           ) : (
             <NoSearchResult />
           )}
-
           {/* <PreviewCard
             id={16961100}
             location={location}

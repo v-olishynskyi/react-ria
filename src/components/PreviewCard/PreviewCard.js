@@ -37,12 +37,6 @@ const PreviewCard = ({ id, location, onChangeSaved, rateUSD }) => {
     onChangeSaved(saved);
   }, [saved, onChangeSaved]);
 
-  // !isLoading &&
-  //   response &&
-  //   console.log(
-  //     response.description_uk ? response.description_uk + true : response.description + false
-  //   );
-
   return (
     <>
       {!isLoading && response && (

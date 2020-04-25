@@ -121,7 +121,6 @@ const Filter = ({
             4+
           </Button>
         </ButtonGroup>
-        <p>Selected: {JSON.stringify(cSelected)}</p>
       </FormGroup>
       <FormGroup inline>
         <Label for="priceInput">
@@ -133,7 +132,7 @@ const Filter = ({
               type="number"
               name="priceFrom"
               id="priceFrom"
-              placeholder="від"
+              placeholder="від (UAH)"
               value={valueFrom}
               onChange={handleChangePrice}
             />
@@ -143,7 +142,7 @@ const Filter = ({
               type="number"
               name="priceTo"
               id="priceTo"
-              placeholder="до"
+              placeholder="до (UAH)"
               value={valueTo}
               onChange={handleChangePrice}
             />

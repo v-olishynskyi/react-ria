@@ -227,7 +227,7 @@ const Advertising = ({ match, location }) => {
   // eslint-disable-next-line no-unused-vars
   const [{ response, isLoading, error }, doFetch] = useFetch(`/info/${slugId}?api_key=${API_KEY}`);
   const [rate, setRate] = useState(null);
-  const [saved, setSaved] = useState(JSON.parse(localStorage.getItem("savedItem")));
+  const [, setSaved] = useState(JSON.parse(localStorage.getItem("savedItem")));
 
   const addToWishlist = React.useCallback(() => {
     const ls = localStorage.getItem("savedItem");
