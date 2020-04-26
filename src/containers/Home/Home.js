@@ -8,12 +8,12 @@ import PreviewCard from "../../components/PreviewCard/PreviewCard";
 import useLocalStorage from "../../hooks/useLocalStorage";
 import Axios from "axios";
 import Pagination from "react-js-pagination";
-// import "bootstrap/less/bootstrap.less";
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
 const Home = ({ location }) => {
   const [ls, setLs] = useLocalStorage("userFilter");
+  const [, setArrItems] = useLocalStorage("items", []);
   const [cSelected, setCSelected] = useState(ls ? ls.cSelected : []);
   const [priceFrom, setPriceFrom] = useState(ls ? ls.priceFrom : "");
   const [priceTo, setPriceTo] = useState(ls ? ls.priceTo : "");
@@ -58,6 +58,10 @@ const Home = ({ location }) => {
     doFetch();
   }, [doFetch, priceFrom, priceTo, cityID, setLs, cSelected, currentPage]);
 
+  useEffect(() => {
+    if (!isLoading && response) setArrItems(response.items);
+  }, [setArrItems, isLoading, response]);
+
   function handleChangePrice(element) {
     element.id === "priceFrom" ? setPriceFrom(element.value) : setPriceTo(element.value);
   }
@@ -84,7 +88,7 @@ const Home = ({ location }) => {
   }
 
   function handleChangeCity(data) {
-    setCityID(data);
+    setCityID(data.value);
   }
 
   function onChangePage(page) {
@@ -107,21 +111,10 @@ const Home = ({ location }) => {
             valueFrom={ls ? ls.priceFrom : priceFrom}
             valueTo={ls ? ls.priceTo : priceTo}
             cSelected={cSelected}
+            cityID={cityID}
           />
         </Col>
         <Col md="9">
-          {!isLoading && response && (
-            <Pagination
-              onChange={onChangePage}
-              totalItemsCount={100}
-              itemsCountPerPage={limit}
-              pageRangeDisplayed={10}
-              activePage={currentPage}
-              itemClass="page-item"
-              linkClass="page-link"
-            />
-          )}
-
           {isLoading ? (
             <Loader />
           ) : !isLoading && response && response.count > 0 ? (
@@ -134,56 +127,23 @@ const Home = ({ location }) => {
                   location={location}
                   onChangeSaved={handleSaved}
                   rateUSD={rateUSD}
+                  arrRes={response.items}
                 />
               ))
           ) : (
             <NoSearchResult />
           )}
-          {/* <PreviewCard
-            id={16961100}
-            location={location}
-            onChangeSaved={handleSaved}
-          />
-          <PreviewCard
-            id={16603196}
-            location={location}
-            onChangeSaved={handleSaved}
-          />
-          <PreviewCard
-            id={16726059}
-            location={location}
-            onChangeSaved={handleSaved}
-          />
-          <PreviewCard
-            id={16961100}
-            location={location}
-            onChangeSaved={handleSaved}
-          />
-          <PreviewCard
-            id={16603196}
-            location={location}
-            onChangeSaved={handleSaved}
-          />
-          <PreviewCard
-            id={16726059}
-            location={location}
-            onChangeSaved={handleSaved}
-          />
-          <PreviewCard
-            id={16961100}
-            location={location}
-            onChangeSaved={handleSaved}
-          />
-          <PreviewCard
-            id={16603196}
-            location={location}
-            onChangeSaved={handleSaved}
-          />
-          <PreviewCard
-            id={16726059}
-            location={location}
-            onChangeSaved={handleSaved}
-          /> */}
+          {!isLoading && response && (
+            <Pagination
+              onChange={onChangePage}
+              totalItemsCount={response.count <= 100 ? response.count : 100}
+              itemsCountPerPage={limit}
+              pageRangeDisplayed={10}
+              activePage={currentPage}
+              itemClass="page-item"
+              linkClass="page-link"
+            />
+          )}
         </Col>
       </Row>
     </>

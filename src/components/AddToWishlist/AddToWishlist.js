@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import "./AddToWishlist.scss";
 
-const AddToWishlist = ({ id, location, onChangeSavedClick }) => {
+const AddToWishlist = ({ id, location }) => {
   const [isHovering, setIsHovering] = useState(false);
   const ls = JSON.parse(localStorage.getItem("savedItem"));
 

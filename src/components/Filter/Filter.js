@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Form, FormGroup, Label, Input, Row, Col, Button, ButtonGroup } from "reactstrap";
 import useFetch from "../../hooks/useFetch";
+import Select from "react-select";
 
 const API_KEY = process.env.REACT_APP_API_KEY;
 
@@ -13,6 +14,7 @@ const Filter = ({
   valueFrom,
   valueTo,
   cSelected,
+  cityID,
 }) => {
   const [{ response: citiesResponse, isLoading: citiesIsLoading }, doFetchCities] = useFetch(
     `/states?api_key=${API_KEY}&lang_id=4`
@@ -30,23 +32,31 @@ const Filter = ({
     doFetchCities();
   }, [doFetchCities]);
 
-  function handleChangePrice(e) {
-    onChangeCountPrice(e.target);
-  }
-
-  function handleChangeCity(e) {
-    onChangeCity(e.target.value);
-  }
-
   function handleSubmit(e) {
     e.preventDefault();
     onSubmitForm();
+  }
+
+  function handleChangeCity(data) {
+    onChangeCity(data);
   }
 
   function handleChangeCountRooms(e) {
     e.preventDefault();
     onCheckRooms(e);
   }
+  let arr = [];
+
+  !citiesIsLoading &&
+    citiesResponse &&
+    citiesResponse
+      .sort((a, b) => a.stateID - b.stateID)
+      .map((item) =>
+        arr.push({
+          value: item.stateID,
+          label: `${item.region_name}, ${item.name} обл.`,
+        })
+      );
 
   return (
     <Form className="position-sticky" style={{ top: "60px" }}>
@@ -54,25 +64,11 @@ const Filter = ({
         <Label for="exampleSelect">
           <b>Виберіть місто</b>
         </Label>
-        <Input
-          type="select"
-          name="select"
-          id="exampleSelect"
+        <Select
+          options={arr}
           onChange={handleChangeCity}
-          placeholder="Виберіть місто"
-        >
-          {!citiesIsLoading &&
-            citiesResponse &&
-            citiesResponse
-              .sort((a, b) => a.stateID - b.stateID)
-              .map((item, key) => (
-                <option
-                  key={key}
-                  value={item.stateID}
-                  selected={item.stateID === 4 ? true : false}
-                >{`${item.region_name}, ${item.name} обл.`}</option>
-              ))}
-        </Input>
+          value={arr.find((op) => op.value === cityID)}
+        />
       </FormGroup>
       <FormGroup inline>
         <Label for="exampleCheckbox">
@@ -134,7 +130,7 @@ const Filter = ({
               id="priceFrom"
               placeholder="від (UAH)"
               value={valueFrom}
-              onChange={handleChangePrice}
+              onChange={(e) => onChangeCountPrice(e.target)}
             />
           </Col>
           <Col xs="6">
@@ -144,7 +140,7 @@ const Filter = ({
               id="priceTo"
               placeholder="до (UAH)"
               value={valueTo}
-              onChange={handleChangePrice}
+              onChange={(e) => onChangeCountPrice(e.target)}
             />
           </Col>
         </Row>
